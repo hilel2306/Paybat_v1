@@ -15,24 +15,25 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 // import { Email, Login } from '@mui/icons-material';
 import { useUserAuth } from '../../contexts/AuthContext';
 
-function Copyright(props: any) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
-                Tradalim
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
+// function Copyright(props: unknown) {
+//     return (
+//         <Typography variant="body2" color="text.secondary" align="center" {...props}>
+//             {'Copyright © '}
+//             <Link color="inherit" href="https://mui.com/">
+//                 Tradalim
+//             </Link>{' '}
+//             {new Date().getFullYear()}
+//             {'.'}
+//         </Typography>
+//     );
+// }
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
-    const { logIn } = useUserAuth()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { logIn }: any = useUserAuth()
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -127,7 +128,7 @@ export default function SignInSide() {
                                     </Link>
                                 </Grid>
                             </Grid>
-                            <Copyright sx={{ mt: 5 }} />
+                            {/* <Copyright sx={{ mt: 5 }} /> */}
                         </Box>
                     </Box>
                 </Grid>
