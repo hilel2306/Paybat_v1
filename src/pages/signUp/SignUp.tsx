@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -14,7 +15,6 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 // import { Email, Login } from '@mui/icons-material';
 import { useUserAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 // function Copyright(props: unknown) {
 //     return (
@@ -32,10 +32,9 @@ import { useNavigate } from 'react-router-dom';
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
-export default function SignInSide() {
-    const navigate = useNavigate();
+export default function SignUpSide() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { logIn }: any = useUserAuth()
+    const { signUp }: any = useUserAuth()
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -43,7 +42,7 @@ export default function SignInSide() {
         const email = data.get('email')
         const password = data.get('password')
         try {
-            logIn(email, password)
+            signUp(email, password)
         } catch (error) {
             console.log('test', error)
         }
@@ -83,7 +82,7 @@ export default function SignInSide() {
                             <LockOutlinedIcon />
                         </Avatar>
                         <Typography component="h1" variant="h5">
-                            Connectez vous
+                            Créez votre compte
                         </Typography>
                         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
                             <TextField
@@ -116,9 +115,8 @@ export default function SignInSide() {
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2 }}
                             >
-                                Connexion
+                                S'inscrire
                             </Button>
-                            <Button fullWidth onClick={() => navigate('/signup')}>Créer un compte</Button>
                             <Grid container>
                                 <Grid item xs>
                                     <Link href="#" variant="body2">

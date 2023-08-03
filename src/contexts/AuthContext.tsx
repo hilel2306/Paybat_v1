@@ -12,23 +12,40 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase/supabaseClient.js';
 
+export interface User {
+    id: string;
+    email: string;
+
+    // Ajoutez d'autres propriétés spécifiques de l'utilisateur ici
+}
+
+export type UserAuth = {
+    logOut: () => void;
+    userLogged: User | null;
+    loading: boolean;
+    // Autres propriétés ou méthodes si nécessaire
+};
+
 const UserAuthContext = createContext();
 
+
 export default function AuthContextProvider({ children }) {
-    const [user, setUser] = useState<User | null>('hilel');
-    const [session, setSession] = useState<Session | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [userLogged, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState<User | null>(true);
     const navigate = useNavigate();
 
     const logIn = async (email, password) => {
         try {
-            const { user, error } = await supabase.auth.signInWithPassword({ email, password });
+            let { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            })
+            console.log("SIGN IN RESPONSE =>", { data, error }); // Ajoutez cette ligne
             if (error) {
                 console.error('Erreur lors de la connexion:', error.message);
                 // Gérer les erreurs de connexion
             } else {
-                setUser(user);
-                navigate('/dashboard');
+                setUser(data.user);
             }
         } catch (error) {
             console.error('Erreur lors de la connexion:', error.message);
@@ -36,48 +53,64 @@ export default function AuthContextProvider({ children }) {
         }
     };
 
-    function signUp(email, password) {
-        return supabase.auth.signUp({ email, password });
-    }
+    const signUp = async (email, password) => {
+        try {
+            let { data, error } = await supabase.auth.signUp({
+                email,
+                password
+            })
+            if (error) {
+                console.error('Erreur lors de l\'inscription:', error.message);
+                // Gérer les erreurs de connexion
+            } else {
+                setUser(user);
+            }
+        } catch (error) {
+            console.error('Erreur lors de la connexion:', error.message);
+            // Gérer les erreurs de connexion
+        }
+    };
 
-    function logOut() {
-        // REDIRECTION SUR PAGE Login
-        navigate('/');
-        return supabase.auth.signOut();
-    }
+    const logOut = async () => {
+        try {
+            let { data, error } = await supabase.auth.signOut();
+            if (error) {
+                console.error('Erreur lors de la déconnexion:', error.message);
+                // Gérer les erreurs de connexion
+            } else {
+                setUser(null); // Réinitialisez l'utilisateur à null après la déconnexion
+
+            }
+        } catch (error) {
+            console.error('Erreur lors de la déconnexion:', error.message);
+            // Gérer les erreurs de connexion
+        }
+    };
 
 
     useEffect(() => {
-        const { data: authListener } = supabase.auth.onAuthStateChange(
-            (event, session) => {
-                console.log('EVENT =>', event);
-                console.log('SESSION =>', session);
+        const setData = async () => {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error) throw error;
+            setUser(session?.user);
+            setLoading(false);
+        };
 
-                if (event === 'SIGNED_IN') {
-                    setUser(session.user);
-                    navigate('/dashboard');
-                } else {
-                    // REDIRECTION SI DECONNECTE
-                    navigate('/');
-                    setUser(null);
-                }
-                setLoading(false);
-            }
-        );
+        const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user);
+            setLoading(false);
+        });
+
+        setData();
 
         return () => {
-
+            listener?.subscription.unsubscribe();
         };
     }, []);
 
-    useEffect(() => {
-        // Ici, nous plaçons le console.log(user) dans un useEffect séparé pour s'assurer
-        // qu'il est exécuté lorsque le user est mis à jour.
-        console.log('USER =>', user);
-    }, [user]);
 
     return (
-        <UserAuthContext.Provider value={{ user, session, logIn, signUp, logOut }}>
+        <UserAuthContext.Provider value={{ userLogged, logIn, signUp, logOut }}>
             {!loading && children}
         </UserAuthContext.Provider>
     );

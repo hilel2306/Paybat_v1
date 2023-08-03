@@ -7,12 +7,13 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import { Link } from "react-router-dom";
+// import { Logout } from '@mui/icons-material';
 
 
 export const mainListItems = (
 
     <React.Fragment>
-        <Link to={"/dashboard"}>
+        <Link to={"/"}>
             <ListItemButton>
                 <ListItemIcon>
                     <ShoppingCartIcon />
@@ -20,7 +21,7 @@ export const mainListItems = (
                 <ListItemText primary="Tableau de bord" />
             </ListItemButton>
         </Link>
-        <Link to={"/"}>
+        <Link to={"/bills"}>
             <ListItemButton>
                 <ListItemIcon>
                     <ShoppingCartIcon />
@@ -32,7 +33,25 @@ export const mainListItems = (
             <ListItemIcon>
                 <BarChartIcon />
             </ListItemIcon>
+            <ListItemText primary="Devis" />
+        </ListItemButton>
+        <ListItemButton>
+            <ListItemIcon>
+                <BarChartIcon />
+            </ListItemIcon>
             <ListItemText primary="Clients" />
+        </ListItemButton>
+        <ListItemButton>
+            <ListItemIcon>
+                <BarChartIcon />
+            </ListItemIcon>
+            <ListItemText primary="Produits" />
+        </ListItemButton>
+        <ListItemButton>
+            <ListItemIcon>
+                <BarChartIcon />
+            </ListItemIcon>
+            <ListItemText primary="Services" />
         </ListItemButton>
     </React.Fragment>
 );
@@ -43,7 +62,13 @@ export const secondaryListItems = (
             <ListItemIcon>
                 <AssignmentIcon />
             </ListItemIcon>
-            <ListItemText primary="Logout" />
+            <ListItemText primary="Paramètres" />
+        </ListItemButton>
+        <ListItemButton>
+            <ListItemIcon>
+                <AssignmentIcon />
+            </ListItemIcon>
+            <ListItemText primary="Mon compte" />
         </ListItemButton>
         <ListSubheader component="div" inset>
             v2.3.1
