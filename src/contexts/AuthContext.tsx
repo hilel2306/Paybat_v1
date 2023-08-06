@@ -15,7 +15,6 @@ import { supabase } from '../supabase/supabaseClient.js';
 export interface User {
     id: string;
     email: string;
-
     // Ajoutez d'autres propriétés spécifiques de l'utilisateur ici
 }
 
@@ -59,11 +58,14 @@ export default function AuthContextProvider({ children }) {
                 email,
                 password
             })
+
             if (error) {
                 console.error('Erreur lors de l\'inscription:', error.message);
                 // Gérer les erreurs de connexion
             } else {
-                setUser(user);
+                console.log("DATA ==>>>> ", data);
+                setUser(data.user);
+                navigate('/')
             }
         } catch (error) {
             console.error('Erreur lors de la connexion:', error.message);

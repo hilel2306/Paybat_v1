@@ -35,6 +35,7 @@ const defaultTheme = createTheme();
 export default function SignUpSide() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { signUp }: any = useUserAuth()
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
