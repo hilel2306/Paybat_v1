@@ -3,7 +3,7 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { supabase } from '../../supabase/supabaseClient'; // Remplacez par votre configuration Supabase
 import { useState, useEffect } from 'react';
 import { GRID_DEFAULT_LOCALE_TEXT } from '../billsTable/localeTextConstant'
-
+import moment from 'moment-timezone';
 const FIELDS_TO_FETCH = 'id, title, created_at,client_id, client_pro_id, amount_including_tax, status';
 
 export default function BillsTable() {
@@ -31,6 +31,38 @@ export default function BillsTable() {
         return columns.filter((col) => col !== null); // Filtrer les colonnes nulles
     }
 
+    function formatDate(dateString) {
+        const date = moment(dateString).tz('Europe/Paris'); // Ajustez le fuseau horaire selon vos besoins
+        console.log(date.format('DD/MM/YYYY'))
+        return date.format('DD/MM/YYYY');
+    }
+
+    // Fonction pour formater un nombre en devise française
+    function formatFrenchCurrency(nombre) {
+        const formatteur = new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'EUR'
+        });
+
+        return formatteur.format(nombre);
+    }
+
+
+
+    // Fonction pour formater un nombre en devise française
+    function formatCurrencyAndDate(bills) {
+        const billsFormated = []
+
+        for (let i = 0; i < bills.length; i++) {
+            bills[i].amount_including_tax = formatFrenchCurrency(bills[i].amount_including_tax);
+            bills[i].created_at = formatDate(bills[i].created_at);
+            billsFormated.push(bills[i])
+        }
+        console.log('BILLSFORMATED', billsFormated);
+        return billsFormated
+    }
+
+
     function sortColumnsOrder(columns) {
         const columnOrder = [
             'title',
@@ -48,6 +80,28 @@ export default function BillsTable() {
     }
 
 
+    function translateColumnsHeader(columns) {
+        const translatedColumns = []
+        for (let i = 0; i < columns.length; i++) {
+            switch (columns[i].field) {
+                case 'title':
+                    columns[i].headerName = 'Titre';
+                    break
+                case 'created_at':
+                    columns[i].headerName = 'Crée le';
+                    break
+                case 'amount_including_tax':
+                    columns[i].headerName = 'Montant HT';
+                    break
+                case 'status':
+                    columns[i].headerName = 'Statut'
+            }
+            translatedColumns.push(columns[i])
+        }
+        return translatedColumns
+    }
+
+
     useEffect(() => {
         const fetchBillData = async () => {
             let { data: bill, error } = await supabase
@@ -62,7 +116,6 @@ export default function BillsTable() {
                 // Pour chaque facture, récupérez les informations sur le client ou le client_pro
                 for (let i = 0; i < bill.length; i++) {
                     const { client_id, client_pro_id } = bill[i];
-                    console.log('CLIENT ID', client_id)
 
                     if (client_id) {
                         // Si c'est un client, récupérez ses informations depuis la table 'client'
@@ -72,7 +125,6 @@ export default function BillsTable() {
                             .eq('id', client_id)
                             .single();
 
-                        console.log('CLIENT DATA', client)
 
                         if (client) {
                             // Mettez à jour la facture avec les informations du client
@@ -92,11 +144,12 @@ export default function BillsTable() {
                         }
                     }
                 }
-
-                setBillData(bill);
+                const billsFormated = formatCurrencyAndDate(bill)
+                setBillData(billsFormated);
                 const generatedColumns = generateColumnsFromData(bill);
                 const sortedColumns = sortColumnsOrder(generatedColumns);
-                setColumns(sortedColumns);
+                const translatedCols = translateColumnsHeader(sortedColumns)
+                setColumns(translatedCols);
             }
         };
         fetchBillData();
